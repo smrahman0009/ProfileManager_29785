@@ -65,12 +65,13 @@ public class SensorsService extends Service implements SensorEventListener{
     }
     public  void makeSilent(){
 
-        for (int i=aMan.getStreamVolume(AudioManager.STREAM_RING);i>=0;i--){
+     /*   for (int i=aMan.getStreamVolume(AudioManager.STREAM_RING);i>=0;i--){
             //  aMan.setStreamMute(AudioManager.STREAM_RING,true);
 
-            aMan.adjustVolume(AudioManager.ADJUST_LOWER,AudioManager.FLAG_SHOW_UI);
+
+         //   aMan.adjustVolume(AudioManager.ADJUST_LOWER,AudioManager.FLAG_SHOW_UI);
             //  aMan.setRingerMode(0);
-        }
+        }*/
         try{
             // aMan.setRingerMode(AudioManager.RINGER_MODE_SILENT);
             aMan.setStreamMute(AudioManager.STREAM_RING,true);
@@ -86,6 +87,11 @@ public class SensorsService extends Service implements SensorEventListener{
         sensorManager.registerListener(this,sensorAcclerometer,SensorManager.SENSOR_DELAY_NORMAL);
         sensorManager.registerListener(this,sensorProximiter,SensorManager.SENSOR_DELAY_NORMAL);
         return START_STICKY;
+    }
+    public void onDestroy(){
+        Toast.makeText(this,"Destroyed",Toast.LENGTH_SHORT).show();
+        super.onDestroy();
+        sensorManager.unregisterListener(this);
     }
     @Override
     public void onSensorChanged(SensorEvent event) {
@@ -103,11 +109,13 @@ public class SensorsService extends Service implements SensorEventListener{
                 IS_HIGH = false;
                 IS_SILENT = false;
                 IS_MEDIUM = true;
+                aMan.setStreamMute(AudioManager.STREAM_RING,false);
                 makeMediam();
             }
         }
         else if (event.sensor.getType()==Sensor.TYPE_PROXIMITY){
             if (event.values[0]==0){
+                aMan.setStreamMute(AudioManager.STREAM_RING,false);
                 makeHigh();
                 IS_MEDIUM=false;
                 IS_SILENT=false;
